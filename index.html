@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Phrasal Verb Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#FFFDF6; --ink:#1E2A3A; --muted:#4E5868; --line:#E6DFC8; --btn-line:#B9C3D0; --btn-shadow:#D3DAE3;
+  --blue:#1A74CC; --blue-dark:#135A9F; --blue-soft:#DCE8F4;
+  --sun:#FFF2C4; --sun-line:#E8C95A; --sun-ink:#5A4E22;
+  --good:#1E7A44; --good-dark:#1E5C38; --good-soft:#E3F4E8; --good-line:#9ED9B3;
+  --bad:#A3271B; --bad-soft:#FDE7E4; --bad-line:#F2B8AE; --red:#C0392B;
+  --orange:#D9530C; --orange-dark:#A8420A; --amber:#A35200;
+  --font:'Nunito','Noto Sans TC','Microsoft JhengHei','PingFang HK',sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-synthesis:none;font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+#app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:10px}
+h1,h2,h3,p{margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.en{font-family:'Nunito',sans-serif}
+.muted{color:var(--muted)}
+
+/* buttons */
+.b3d{border:2px solid var(--btn-line);background:#fff;border-radius:16px;box-shadow:0 4px 0 var(--btn-shadow);font-weight:800;min-height:52px;padding:0 16px;transition:transform .05s}
+.b3d:active{transform:translateY(2px);box-shadow:0 2px 0 var(--btn-shadow)}
+.primary{border-color:var(--blue-dark);background:var(--blue);color:#fff;box-shadow:0 4px 0 var(--blue-dark)}
+.primary:active{box-shadow:0 2px 0 var(--blue-dark)}
+.primary:disabled{opacity:.5}
+.wide{width:100%;font-size:17px;min-height:56px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.icon-btn{width:46px;height:46px;flex:none;border:2px solid var(--blue);border-radius:14px;background:#fff;display:grid;place-items:center;padding:0;box-shadow:0 3px 0 #9DB7D1}
+.x-btn{width:44px;height:44px;flex:none;border:2px solid var(--btn-line);border-radius:14px;background:#fff;display:grid;place-items:center;padding:0;box-shadow:0 3px 0 var(--btn-shadow)}
+.say{width:44px;height:44px;flex:none;border:0;background:none;display:grid;place-items:center;padding:0}
+.say span{width:34px;height:34px;border-radius:50%;border:2px solid var(--sun-line);background:#fff;display:grid;place-items:center}
+
+/* home */
+.home-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 14px;border-bottom:2px solid var(--line)}
+.title{font-size:min(28px,7.2vw);font-weight:900;letter-spacing:-.01em;line-height:1.15;color:var(--orange);white-space:nowrap}
+.subtitle{font-size:16px;font-weight:700;color:var(--orange-dark)}
+.sec{padding:24px 20px 0;display:flex;flex-direction:column;gap:12px}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--muted);font-weight:700}
+.sec-h{display:flex;align-items:center;gap:10px}
+.sec-h .n{width:30px;height:30px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-weight:800;font-size:16px;flex:none}
+.sec-h h2{font-size:19px;font-weight:700}
+.sec-h small{font-size:13px;color:var(--muted);font-weight:400}
+.wod{background:var(--sun);border:2px solid var(--sun-line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.wod .ph{font-size:34px;font-weight:800;line-height:1.1}
+.pill{font-size:13px;font-weight:700;background:#fff;border-radius:99px;padding:4px 12px;display:inline-block}
+.lv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.lv{height:52px;padding:0 6px;font-size:15px}
+.lv[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft);color:var(--blue-dark);box-shadow:0 4px 0 var(--blue)}
+.plist{display:flex;flex-direction:column;gap:8px}
+.prow{display:grid;grid-template-columns:76px 1fr auto 26px;align-items:center;gap:8px;min-height:56px;padding:0 12px 0 14px;border-radius:14px;border:2px solid var(--pl);background:#fff;text-align:left;box-shadow:0 4px 0 var(--pl);font-weight:400}
+.prow .pw{font-size:22px;font-weight:800;color:var(--pc)}
+.prow .pd{font-size:14px;color:#3A3F48}
+.prow .pn{font-size:13px;font-weight:700;color:var(--muted)}
+.prow .tick{width:24px;height:24px;border-radius:7px;border:2px solid var(--pl);display:grid;place-items:center;background:#fff}
+.prow[aria-pressed="true"]{background:var(--pb);border-color:var(--pc);box-shadow:0 4px 0 var(--pc)}
+.prow[aria-pressed="true"] .tick{background:var(--pc);border-color:var(--pc)}
+.prow[aria-pressed="true"] .pd,.prow[aria-pressed="true"] .pn{color:var(--pc)}
+.linkbtn{background:none;border:0;padding:6px 0;color:var(--blue);font-weight:700;font-size:14px;text-decoration:underline;text-underline-offset:4px;align-self:flex-start;min-height:36px}
+.pool-note{font-size:14px;color:var(--muted);background:#fff;border:2px dashed var(--line);border-radius:14px;padding:10px 14px}
+.pool-note b{color:var(--ink)}
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mode{border:2px solid var(--btn-line);background:#fff;border-radius:18px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:4px;box-shadow:0 4px 0 var(--btn-shadow);min-height:96px}
+.mode:disabled{opacity:.5}
+.mode .st{font-size:12px;font-weight:700;color:var(--muted)}
+.mode b{font-size:17px;font-weight:800}
+.mode .ds{font-size:13px;color:#3A3F48}
+.mode.first{background:#FFE7A3;border-color:#D9A92A;box-shadow:0 4px 0 #D9A92A}
+.nav{position:sticky;bottom:env(safe-area-inset-bottom,0px);margin:22px 16px 12px;background:#fff;border:2px solid var(--line);border-radius:22px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:6px;gap:4px;z-index:4}
+.nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;border-radius:16px;border:0;background:none;color:var(--muted);font-size:12px;font-weight:600}
+.nav button[aria-current="page"]{background:var(--blue-soft);color:var(--blue-dark)}
+.spacer{flex:1}
+
+/* practice shell */
+.ptop{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;gap:12px;padding:16px 20px 10px}
+.ptop .meta{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.ptop .meta div{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--muted)}
+.prog{height:12px;border-radius:99px;background:#EFE8D2;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--blue);border-radius:99px;transition:width .25s}
+.pbody{padding:8px 20px 28px;display:flex;flex-direction:column;gap:14px}
+.qcard{background:#fff;border:2px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.qlabel{font-size:15px;font-weight:700;color:var(--muted)}
+.qsent{font-size:21px;line-height:1.75}
+.blank{display:inline-block;min-width:72px;border-bottom:3px solid var(--ink);text-align:center;font-weight:900}
+.blank.ok{border-color:var(--good);color:var(--good)}
+.qhint{font-size:15px;color:var(--muted)}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 16px;border-radius:16px;border:2px solid var(--btn-line);background:#fff;text-align:left;box-shadow:0 4px 0 var(--btn-shadow)}
+.opt .ol{width:30px;height:30px;border-radius:50%;background:#EEF1F5;display:grid;place-items:center;flex:none;font-size:14px;font-weight:800}
+.opt .ot{font-size:20px;font-weight:700}
+.opt.sent .ot{font-size:17px;font-weight:600}
+.opt:disabled{cursor:default;box-shadow:none;color:var(--muted)}
+.opt.ok{border-color:#3E8E5E;background:var(--good-soft);color:var(--good-dark);box-shadow:0 4px 0 #3E8E5E}
+.opt.ok .ol{background:var(--good);color:#fff}
+.opt.bad{border-color:var(--red);background:var(--bad-soft);color:var(--bad);box-shadow:0 4px 0 var(--red)}
+.opt.bad .ol{background:var(--red);color:#fff}
+.fb{border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px;border:2px solid}
+.fb.good{background:var(--good-soft);border-color:var(--good-line)}
+.fb.bad{background:var(--bad-soft);border-color:var(--bad-line)}
+.fb h3{font-size:18px;font-weight:700}
+.fb.good h3{color:var(--good)}
+.fb.bad h3{color:var(--bad)}
+.fb p{font-size:17px;line-height:1.6}
+.fb .ph{font-weight:900;color:var(--blue)}
+.fb ul{margin:0;padding-left:20px;font-size:16px;line-height:1.6}
+.hl{font-weight:900;color:var(--blue-dark)}
+.wbox{display:inline-block;height:46px;border:2px solid var(--btn-line);border-radius:12px;padding:0 8px;font-size:20px;font-weight:700;vertical-align:middle;margin:3px 2px;background:#fff;min-width:3.5ch;text-align:center}
+.wbox:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 3px var(--blue-soft)}
+.wbox.ok{border-color:var(--good);background:var(--good-soft);color:var(--good-dark)}
+.wbox.bad{border-color:var(--red);background:var(--bad-soft);color:var(--bad)}
+.basehint{font-size:15px;color:var(--muted);white-space:nowrap}
+.timecue{background:var(--sun);border-radius:6px;padding:0 4px}
+
+/* flashcard */
+.fcard{background:var(--sun);border:2px solid var(--sun-line);border-radius:24px;padding:22px 20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 5px 0 var(--sun-line)}
+.fcard .big{font-size:40px;font-weight:900;line-height:1.08;color:var(--blue)}
+.fcard .big u{text-decoration-color:#F0A23B;text-decoration-thickness:5px;text-underline-offset:6px}
+.fcard .ty{font-size:13px;font-weight:600;color:var(--sun-ink)}
+.fcard .zh{font-size:22px;font-weight:700}
+.fcard hr{border:0;height:2px;background:var(--sun-line);opacity:.6;margin:2px 0}
+.mean{display:flex;flex-direction:column;gap:6px}
+.mean .mh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.mean .mn{font-size:13px;font-weight:800;color:var(--sun-ink);background:#fff;border-radius:99px;padding:1px 9px}
+.mean .mz{font-size:19px;font-weight:700}
+.mean .ex{font-size:19px;line-height:1.5}
+.mean .pat{font-size:15px;color:var(--sun-ink)}
+.mean .note{font-size:14px;color:#3E3A2A}
+.ptag{font-size:13px;font-weight:700;border-radius:99px;padding:3px 12px;border:2px solid var(--pl);background:var(--pb);color:var(--pc);display:inline-block}
+.ask{text-align:center;font-size:17px;color:var(--muted)}
+
+/* lists / pages */
+.page-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:2px solid var(--line)}
+.page-head h1{font-size:19px;font-weight:800}
+.search{width:100%;min-height:50px;border:2px solid var(--btn-line);border-radius:14px;padding:0 14px;font-size:17px;background:#fff}
+.search:focus{border-color:var(--blue);outline:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-height:38px;border-radius:99px;border:2px solid var(--btn-line);background:#fff;padding:0 12px;font-size:14px;font-weight:700}
+.chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.check{display:flex;gap:10px;align-items:center;font-size:15px;min-height:40px}
+.check input{width:22px;height:22px;accent-color:var(--blue)}
+.vlist{display:flex;flex-direction:column;gap:8px}
+.vrow{background:#fff;border:2px solid var(--line);border-radius:16px;overflow:hidden}
+.vhead{width:100%;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;text-align:left;background:none;border:0;padding:12px 14px;min-height:56px}
+.vhead b{font-size:19px;font-weight:800}
+.vhead .vz{font-size:15px;color:var(--muted)}
+.vhead .vz.hide{background:#EEF1F5;color:transparent;border-radius:6px;user-select:none}
+.vhead .lvl{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:#D3DAE3;vertical-align:middle}
+.dot.l{background:#E0A100}.dot.m{background:var(--good)}
+.vmore{border-top:2px dashed var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:14px;background:#FFFEFA}
+.kv{font-size:15px;line-height:1.55}
+.kv b{font-weight:700;color:var(--muted);margin-right:6px}
+.card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-size:18px;font-weight:800}
+.bar{display:flex;height:12px;border-radius:99px;overflow:hidden;background:#EFE8D2}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:var(--c)}
+.statrow{display:grid;grid-template-columns:80px 1fr 64px;align-items:center;gap:10px;font-size:14px}
+.statrow b{font-size:17px;font-weight:800}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px}
+.seg button{min-height:48px;font-size:15px}
+.seg button[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft);color:var(--blue-dark);box-shadow:0 4px 0 var(--blue)}
+.score{background:var(--sun);border:2px solid var(--sun-line);border-radius:24px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 5px 0 var(--sun-line);text-align:center}
+.score .num{font-size:60px;font-weight:900;line-height:1;color:var(--blue)}
+.miss{background:#fff;border:2px solid var(--line);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.miss .mh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.miss .mh b{font-size:19px;font-weight:900}
+.strike{color:var(--bad);font-weight:700;text-decoration:line-through}
+.meaning-card{background:#fff;border:2px solid var(--pl);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.meaning-card .mt{display:flex;align-items:center;gap:10px}
+.meaning-card .mt span{width:28px;height:28px;border-radius:50%;background:var(--pb);color:var(--pc);display:grid;place-items:center;font-weight:900;font-size:15px;flex:none}
+.meaning-card .mt b{font-size:19px;font-weight:700;color:var(--pc)}
+.egs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.egs span{display:flex;flex-direction:column;gap:1px}
+.egs b{font-size:19px;font-weight:900;color:var(--blue)}
+.egs small{font-size:14px;color:var(--muted)}
+.empty{padding:30px 20px;text-align:center;color:var(--muted)}
+.boot{padding:40px 20px;display:flex;flex-direction:column;gap:12px}
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);max-width:min(440px,calc(100% - 32px));background:var(--ink);color:#fff;font-size:15px;line-height:1.5;padding:12px 16px;border-radius:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"><div class="boot"><div class="title">Phrasal Verb Trainer</div><p>程式載入中……</p><p class="muted">如果這一頁一直沒有變化，請用 Chrome 或 Safari 瀏覽器開啟這個連結，不要用 WhatsApp 或 Google Drive 的預覽。</p></div></div>
+<script src="data.js"></script>
+<script>
+(function(){
+"use strict";
+const D = window.PVT_DATA;
+const app = document.getElementById('app');
+if (!D) { app.innerHTML = '<div class="boot"><div class="title">Phrasal Verb Trainer</div><p>未能載入資料檔 (data.js)。</p></div>'; return; }
+
+/* ---------- constants ---------- */
+const LV = ['P5–P6 核心', 'S1', '進階'];
+const GROUPS = ['up','down','out','off','on','in','away','back','over','through','其他'];
+const PCOL = {
+  up:['#24613D','#3E8E5E','#E3F4E8'], down:['#5F4596','#BDAEDC','#F1ECFF'], out:['#A9432C','#E6B4A3','#FDEEE8'],
+  off:['#1A5FA6','#A9C4E2','#E6F0FA'], on:['#7A4E00','#D9B65A','#FFF4D6'], in:['#0F6763','#94CEC9','#E2F5F3'],
+  away:['#94285C','#E3B3CB','#FBEAF2'], back:['#2F4F8F','#AFC0E3','#EAF0FB'], over:['#6E4A12','#D9BE92','#FBF1E2'],
+  through:['#46561A','#BFCB8E','#F2F6E2'], '其他':['#4E5868','#C3CAD4','#F1F3F6']
+};
+const PARTS = new Set(['up','down','out','off','on','in','into','away','back','over','through','about','after','along','around','at','behind','by','for','forward','from','of','to','with','against','ahead','apart','aside','together','across','upon']);
+const GENERIC = ['up','down','out','off','on','in','away','back','over','for','at','with'];
+const MC_EXCLUDE = {'dream about':['of'],'dream of':['about'],'be fed up with':['of'],'die of':['from'],'die from':['of'],'hear of':['about'],'talk about':['of'],'complain about':['of'],'think of':['about'],'care for':['about'],'go through':['over'],'go over':['through'],'fill in':['out'],'put off':['back'],'set off':['out'],'set out':['off'],'think over':['through'],'drop by':['in'],'drop in':['by'],'call at':['in'],'look out':['for'],'turn around':['round'],'quarrel about':['over'],'help out':['up'],'clean up':['out'],'clear up':['out'],'lock up':['in'],'shut down':['up','off'],'wake up':['in'],'tire out':['up'],'wear out':['down'],'speak up':['out'],'speak out':['up'],'hand in':['over'],'hand over':['in'],'give in':['up'],'look into':['at'],'stick with':['to'],'stick to':['with'],'leave out':['off'],'cut down':['back'],'cut back on':['down'],'end up':['out'],'move on':['ahead'],'carry on':['ahead'],'go on':['ahead'],'hold on':['up'],'hang on':['up','back'],'come along':['over'],'come over':['along','round'],'get back':['in'],'back up':['out'],'pay back':['off']};
+
+/* ---------- small helpers ---------- */
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick1 = a => a[Math.floor(Math.random() * a.length)];
+const norm = s => String(s).toLowerCase().replace(/[’‘]/g, "'").replace(/[.!?,]+$/,'').replace(/\s+/g, ' ').trim();
+const pvar = g => { const c = PCOL[g] || PCOL['其他']; return '--pc:' + c[0] + ';--pl:' + c[1] + ';--pb:' + c[2]; };
+const ICON = {
+  search:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A74CC" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>',
+  x:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E2A3A" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  back:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E2A3A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  say:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A4E22" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 9a4 4 0 0 1 0 6"/></svg>',
+  tick:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+  ok:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+  next:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  home:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"/></svg>',
+  list:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h3"/></svg>',
+  chart:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>',
+  gear:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>'
+};
+
+/* ---------- data indexes ---------- */
+const PH = D.phrases;
+const MEAN = [];            // flat list of meanings with a back-pointer
+PH.forEach(p => p.m.forEach((m, i) => { m.ph = p; m.n = i + 1; MEAN.push(m); }));
+const byId = {}; MEAN.forEach(m => byId[m.id] = m);
+const PM = D.pm;            // particle -> meaning tags (most common first)
+
+/* ---------- verb forms (for feedback) ---------- */
+const IRR = {
+  be:[['was','were'],['been'],['am','is','are'],'being'], blow:[['blew'],['blown']], break:[['broke'],['broken']], bring:[['brought'],['brought']],
+  build:[['built'],['built']], catch:[['caught'],['caught']], come:[['came'],['come']], cut:[['cut'],['cut']], deal:[['dealt'],['dealt']],
+  dream:[['dreamt','dreamed'],['dreamt','dreamed']], eat:[['ate'],['eaten']], fall:[['fell'],['fallen']], feed:[['fed'],['fed']],
+  fight:[['fought'],['fought']], find:[['found'],['found']], fit:[['fitted','fit'],['fitted','fit']], forgive:[['forgave'],['forgiven']],
+  get:[['got'],['got']], give:[['gave'],['given']], go:[['went'],['gone']], grow:[['grew'],['grown']], hang:[['hung'],['hung']],
+  hear:[['heard'],['heard']], hold:[['held'],['held']], keep:[['kept'],['kept']], lay:[['laid'],['laid']], lead:[['led'],['led']],
+  leave:[['left'],['left']], let:[['let'],['let']], lie:[['lay','lied'],['lain','lied'],null,'lying'], light:[['lit','lighted'],['lit','lighted']],
+  make:[['made'],['made']], mistake:[['mistook'],['mistaken']], pay:[['paid'],['paid']], put:[['put'],['put']], run:[['ran'],['run']],
+  see:[['saw'],['seen']], sell:[['sold'],['sold']], send:[['sent'],['sent']], set:[['set'],['set']], shoot:[['shot'],['shot']],
+  show:[['showed'],['shown','showed']], shut:[['shut'],['shut']], sit:[['sat'],['sat']], speak:[['spoke'],['spoken']],
+  speed:[['sped','speeded'],['sped','speeded']], spend:[['spent'],['spent']], stand:[['stood'],['stood']], stick:[['stuck'],['stuck']],
+  take:[['took'],['taken']], tear:[['tore'],['torn']], think:[['thought'],['thought']], throw:[['threw'],['thrown']],
+  wake:[['woke'],['woken']], wear:[['wore'],['worn']], do:[['did'],['done'],['does']]
+};
+const DOUBLE = new Set(['drop','rub','step','stop','sum','wrap','quarrel','refer','prefer','fit','plan','shut','cut','set','let','put','get','sit','run','begin','forget','hit','swim','shop','chat','travel']);
+const AUX = new Set(['am','is','are','was','were','be','been','being','has','have','had','will','would','do','does','did','shall']);
+function forms(b){
+  const ir = IRR[b];
+  const vow = /[aeiou]/;
+  let s, past, pp, ing;
+  if (/(s|x|z|ch|sh|o)$/.test(b)) s = b + 'es'; else if (/[^aeiou]y$/.test(b)) s = b.slice(0, -1) + 'ies'; else s = b + 's';
+  if (/e$/.test(b)) past = b + 'd'; else if (/[^aeiou]y$/.test(b)) past = b.slice(0, -1) + 'ied'; else if (DOUBLE.has(b)) past = b + b.slice(-1) + 'ed'; else past = b + 'ed';
+  if (/ie$/.test(b)) ing = b.slice(0, -2) + 'ying'; else if (/[^e]e$/.test(b) && b !== 'be') ing = b.slice(0, -1) + 'ing'; else if (DOUBLE.has(b)) ing = b + b.slice(-1) + 'ing'; else ing = b + 'ing';
+  const f = {base:[b], s:[s], past:[past], pp:[past], ing:[ing]};
+  if (ir) { f.past = ir[0]; f.pp = ir[1]; if (ir[2]) f.s = ir[2]; if (ir[3]) f.ing = [ir[3]]; }
+  if (b === 'lie') { f.ing = ['lying']; }
+  f.all = new Set([].concat(f.base, f.s, f.past, f.pp, f.ing));
+  return f;
+}
+const FORMS = {}; const formsOf = b => FORMS[b] || (FORMS[b] = forms(b));
+
+/* ---------- storage ---------- */
+const KEY = 'pvt.v1'; let memStore = null;
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return memStore || {}; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){ memStore = DB; } }
+const DB = load();
+DB.box = DB.box || {};
+DB.set = Object.assign({levels:[0], parts:[], count:10, focus:true}, DB.set || {});
+const SET = DB.set;
+const boxOf = id => (DB.box[id] && DB.box[id].b) || 0;
+function setBox(id, ok, hint){
+  const e = DB.box[id] || {b:0, seen:0, wrong:0};
+  e.seen++;
+  if (ok) e.b = hint ? Math.max(1, e.b || 0) : Math.min(5, (e.b || 0) + 1); else { e.b = 1; e.wrong++; }
+  DB.box[id] = e; save();
+}
+
+/* ---------- pool ---------- */
+const inLevels = p => SET.levels.includes(p.lv);
+const inParts = p => !SET.parts.length || SET.parts.includes(p.g);
+const poolPhrases = () => PH.filter(p => inLevels(p) && inParts(p));
+const poolMeanings = () => poolPhrases().flatMap(p => p.m);
+function stats(ms){ let n = 0, l = 0, k = 0; ms.forEach(m => { const b = boxOf(m.id); if (!b) n++; else if (b >= 4) k++; else l++; }); return {n, l, m:k}; }
+function choose(list, keyFn){
+  const a = SET.focus ? list.map(x => [x, keyFn(x) + Math.random() * 1.6]).sort((x, y) => x[1] - y[1]).map(x => x[0]) : shuffle(list);
+  const n = SET.count || a.length; return shuffle(a.slice(0, Math.min(n, a.length)));
+}
+
+/* ---------- speech ---------- */
+const canSpeak = 'speechSynthesis' in window;
+function toast(msg){
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 3500);
+}
+const NO_SPEECH = '這個瀏覽器不支援朗讀，請改用 Chrome 或 Safari。';
+function say(text){
+  if (!canSpeak) { toast(NO_SPEECH); return; }
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'en-GB'; u.rate = .85;
+    const vs = speechSynthesis.getVoices().filter(v => /en-GB/i.test(v.lang)); if (vs[0]) u.voice = vs[0];
+    let started = false; u.onstart = () => { started = true; };
+    u.onerror = () => { if (!started) toast(NO_SPEECH); };
+    speechSynthesis.speak(u);
+    setTimeout(() => { if (!started && !speechSynthesis.speaking) toast(NO_SPEECH); }, 1500);
+  } catch(e){ toast(NO_SPEECH); }
+}
+const sayBtn = text => '<button class="say" data-say="' + esc(text) + '" aria-label="朗讀"><span>' + ICON.say + '</span></button>';
+
+/* ---------- template parsing ---------- */
+function parseT(t){
+  const segs = []; let last = 0; const re = /\[(.*?)\]/g; let m;
+  while ((m = re.exec(t))) { segs.push({txt: t.slice(last, m.index)}); segs.push({ans: m[1]}); last = re.lastIndex; }
+  segs.push({txt: t.slice(last)});
+  return segs;
+}
+const groupsOf = t => parseT(t).filter(s => s.ans != null).map(s => s.ans);
+const fullSent = t => t.replace(/\[(.*?)\]/g, '$1');
+const sentHtml = (t, cls) => esc(t).replace(/\[(.*?)\]/g, (m, a) => '<b class="' + (cls || 'hl') + '">' + a + '</b>');
+const altsOf = (m, i) => (m.a[i] || '').split(/\s*\|\s*/).filter(Boolean).map(a => a.split(/\s*…\s*/).map(norm));
+
+/* highlight the phrase inside a free example sentence */
+function hlEx(ex, ph){
+  const words = ph.p.split(' '); const f = formsOf(ph.b);
+  const toks = ex.split(/(\s+)/);
+  let started = -1; const marks = new Set();
+  for (let i = 0; i < toks.length; i++) {
+    const w = toks[i].toLowerCase().replace(/[^a-z']/g, '');
+    if (started < 0) { if (f.all.has(w) || (ph.b === 'be' && /^(am|is|are|was|were|be|been|'m|'re|'s)$/.test(w))) { started = i; marks.add(i); } }
+    else {
+      if (i - started > 14) break;
+      if (words.slice(1).includes(w) || (w === 'yourself' || w === 'themselves' || w === 'myself' || w === 'himself' || w === 'herself')) marks.add(i);
+      if (w === words[words.length - 1]) break;
+    }
+  }
+  if (!marks.size) return esc(ex);
+  return toks.map((t, i) => marks.has(i) ? '<b class="hl">' + esc(t) + '</b>' : esc(t)).join('');
+}
+function bigPhrase(ph){
+  const w = ph.p.split(' ');
+  return esc(w[0]) + ' ' + w.slice(1).map(x => PARTS.has(x) ? '<u style="color:var(--pc)">' + esc(x) + '</u>' : esc(x)).join(' ');
+}
+
+/* ---------- state ---------- */
+let VIEW = 'home'; let S = null; let showAllParts = false;
+let B = {q:'', cover:false, open:null, lv:'sel', g:''};
+
+/* ---------- render helpers ---------- */
+function nav(cur){
+  const it = [['home','首頁','home'],['browse','查表','list'],['progress','進度','chart'],['settings','設定','gear']];
+  return '<nav class="nav" aria-label="主選單">' + it.map(x => '<button data-go="' + x[0] + '"' + (cur === x[0] ? ' aria-current="page"' : '') + '>' + ICON[x[2]] + x[1] + '</button>').join('') + '</nav>';
+}
+function render(html){ app.innerHTML = html; window.scrollTo(0, 0); }
+const focusSoon = sel => setTimeout(() => { const e = typeof sel === 'string' ? app.querySelector(sel) : sel; if (e) e.focus({preventScroll:false}); }, 40);
+
+/* ---------- home ---------- */
+function wordOfDay(){
+  const list = PH.filter(p => p.lv === 0 && p.g !== '其他');
+  const day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 864e5);
+  const p = list[day % list.length]; const m = p.m[0];
+  return {p, m};
+}
+function partCount(g){ return PH.filter(p => inLevels(p) && p.g === g).length; }
+function partDesc(g){ return g === '其他' ? 'with, for, of, to 等' : (PM[g] || []).slice(0, 3).join(' · '); }
+function home(){
+  VIEW = 'home'; S = null;
+  const w = wordOfDay();
+  const ph = poolPhrases(), ms = poolMeanings(), st = stats(ms);
+  const shown = showAllParts ? GROUPS : GROUPS.filter((g, i) => i < 4 || SET.parts.includes(g));
+  const partsTxt = SET.parts.length ? SET.parts.join('、') : '全部 particles';
+  const lvTxt = SET.levels.length ? SET.levels.slice().sort().map(i => LV[i]).join('、') : '未選程度';
+  render(
+  '<header class="home-head"><div><div class="title">Phrasal Verb Trainer</div><div class="subtitle">片語動詞練習</div></div>' +
+  '<button class="icon-btn" data-go="browse" data-focus="search" aria-label="搜尋片語">' + ICON.search + '</button></header>' +
+
+  '<section class="sec"><div class="eyebrow">今日一詞 · WORD OF THE DAY</div>' +
+  '<div class="wod" style="' + pvar(w.p.g) + '"><div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span class="ph">' + bigPhrase(w.p) + '</span><span style="font-size:13px;color:var(--sun-ink)">' + esc(w.m.ty) + '</span></div>' +
+  '<div style="font-size:19px;font-weight:700">' + esc(w.m.zh) + '</div>' +
+  '<p style="font-size:16px;line-height:1.6;color:#2E3A4C">' + hlEx(w.m.ex, w.p) + '</p>' +
+  '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' + (w.m.pm !== '—' ? '<span class="pill" style="color:var(--pc)">' + esc(w.p.g) + ' = ' + esc(w.m.pm) + '</span>' : '') + '<span class="pill" style="color:var(--sun-ink)">' + LV[w.p.lv] + '</span><span style="flex:1"></span>' + sayBtn(w.p.p + '. ' + w.m.ex) + '</div></div></section>' +
+
+  '<section class="sec"><div class="sec-h"><span class="n">1</span><h2>選程度 <small>可多選</small></h2></div><div class="lv-grid" role="group" aria-label="程度">' +
+  LV.map((l, i) => '<button class="b3d lv" data-lv="' + i + '" aria-pressed="' + SET.levels.includes(i) + '">' + l + '</button>').join('') + '</div></section>' +
+
+  '<section class="sec"><div class="sec-h"><span class="n">2</span><h2>Particles 索引 <small>不選 = 全部</small></h2></div><div class="plist" role="group" aria-label="Particles">' +
+  shown.map(g => '<button class="prow" style="' + pvar(g) + '" data-part="' + esc(g) + '" aria-pressed="' + SET.parts.includes(g) + '"><span class="pw">' + esc(g) + '</span><span class="pd">' + esc(partDesc(g)) + '</span><span class="pn">' + partCount(g) + '</span><span class="tick">' + (SET.parts.includes(g) ? ICON.tick : '') + '</span></button>').join('') + '</div>' +
+  '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">' + (showAllParts ? '<button class="linkbtn" data-act="lessparts">收起</button>' : '<button class="linkbtn" data-act="allparts">查看全部 10 個 particles 及其他 →</button>') +
+  (SET.parts.length ? '<button class="linkbtn" data-act="clearparts">清除選擇</button>' : '') + '</div></section>' +
+
+  '<section class="sec"><div class="sec-h"><span class="n">3</span><h2>開始練習</h2></div>' +
+  '<div class="pool-note">' + (ph.length ? '已選：' + esc(lvTxt) + ' · ' + esc(partsTxt) + '<br>共 <b>' + ph.length + '</b> 個片語、<b>' + ms.length + '</b> 個意思 · 已掌握 ' + st.m + '　練習中 ' + st.l : '這個範圍沒有片語，請選擇程度或 particles。') + '</div>' +
+  '<div class="modes">' +
+  '<button class="mode first" data-mode="flash"' + (ph.length ? '' : ' disabled') + '><span class="st" style="color:var(--sun-ink)">第 1 步</span><b style="color:var(--amber)">記憶卡</b><span class="ds">認識新片語</span></button>' +
+  '<button class="mode" data-mode="choice"' + (ph.length ? '' : ' disabled') + '><span class="st">第 2 步</span><b style="color:var(--blue)">選擇題</b><span class="ds">四選一，先認得</span></button>' +
+  '<button class="mode" data-mode="fill"' + (ph.length ? '' : ' disabled') + '><span class="st">第 3 步</span><b style="color:var(--red)">句子填空</b><span class="ds">寫出來，留意時態</span></button>' +
+  '<button class="mode" data-go="particles"><span class="st">加深</span><b style="color:var(--good)"><span style="font-weight:900">Particle</span> 意思</b><span class="ds">明白 particle 的邏輯</span></button>' +
+  '</div></section><div class="spacer"></div>' + nav('home'));
+}
+
+/* ---------- session shell ---------- */
+const MODE_NAME = {flash:'記憶卡', choice:'選擇題', fill:'句子填空', pmq:'Particle 意思'};
+const MODE_COL = {flash:'var(--amber)', choice:'var(--blue)', fill:'var(--red)', pmq:'var(--good)'};
+function topbar(){
+  const total = S.items.length, done = S.i;
+  const lvName = S.label || SET.levels.slice().sort().map(i => LV[i]).join('、');
+  return '<header class="ptop"><button class="x-btn" data-act="exit" aria-label="離開練習">' + ICON.x + '</button><div class="meta"><div><span style="color:' + MODE_COL[S.mode] + '">' + MODE_NAME[S.mode] + ' · ' + esc(lvName) + '</span><span>' + Math.min(done + 1, total) + ' / ' + total + '</span></div>' +
+    '<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + done + '"><i style="width:' + (done / total * 100) + '%"></i></div></div></header>';
+}
+function start(mode, opts){
+  opts = opts || {};
+  let items;
+  if (opts.items) items = opts.items;
+  else if (mode === 'flash') items = choose(poolPhrases(), p => Math.min.apply(null, p.m.map(m => boxOf(m.id))));
+  else if (mode === 'pmq') items = choose(opts.list || poolMeanings().filter(m => m.pm !== '—' && m.ph.g !== '其他'), m => boxOf(m.id));
+  else items = choose(poolMeanings(), m => boxOf(m.id));
+  if (!items.length) { alertBox('這個範圍沒有可以練習的題目。'); return; }
+  S = {mode, items, i:0, res:[], phase:'ask', label:opts.label || null};
+  VIEW = 'session';
+  question();
+}
+function alertBox(msg){ const n = app.querySelector('.pool-note'); if (n) n.textContent = msg; }
+function next(){
+  S.i++; S.phase = 'ask'; S.q = null;
+  if (S.i >= S.items.length) results(); else question();
+}
+function question(){ ({flash:qFlash, choice:qChoice, fill:qFill, pmq:qPm})[S.mode](S.items[S.i]); }
+function record(item, ok, extra){ S.res.push(Object.assign({item, ok}, extra || {})); }
+
+/* ---------- flashcards ---------- */
+function meaningBlock(m, showN){
+  return '<div class="mean"><div class="mh">' + (showN ? '<span class="mn">' + m.n + '</span>' : '') + '<span class="mz">' + esc(m.zh) + '</span>' + (m.pm !== '—' ? '<span class="ptag" style="' + pvar(m.ph.g) + '">' + esc(m.ph.g) + ' = ' + esc(m.pm) + '</span>' : '') + '</div>' +
+    '<div class="pat en">' + esc(m.pat) + '</div>' +
+    '<p class="ex">' + hlEx(m.ex, m.ph) + '</p>' +
+    (m.col ? '<div class="note"><b>常用搭配：</b><span class="en">' + esc(m.col) + '</span></div>' : '') +
+    (m.rel ? '<div class="note">' + esc(m.rel) + '</div>' : '') +
+    (m.tip ? '<div class="note">提示：' + esc(m.tip) + '</div>' : '') + '</div>';
+}
+function qFlash(p){
+  const multi = p.m.length > 1;
+  render(topbar() + '<main class="pbody"><div class="fcard" style="' + pvar(p.g) + '">' +
+    '<div style="display:flex;align-items:center;gap:8px"><span class="pill" style="color:var(--sun-ink)">' + LV[p.lv] + '</span><span style="flex:1"></span>' + sayBtn(p.p) + '</div>' +
+    '<div class="big">' + bigPhrase(p) + '</div><div class="ty">' + esc(p.m[0].ty) + (multi ? ' · ' + p.m.length + ' 個意思' : '') + '</div>' +
+    p.m.map((m, i) => (i ? '<hr>' : '') + meaningBlock(m, multi)).join('') + '</div>' +
+    '<p class="ask">你記得這個片語嗎？</p><div class="row2"><button class="b3d" data-act="fno">還未記得</button><button class="b3d primary" data-act="fyes">我記得了</button></div></main>');
+}
+function flashAnswer(ok){ const p = S.items[S.i]; p.m.forEach(m => setBox(m.id, ok)); record(p, ok); next(); }
+
+/* ---------- multiple choice ---------- */
+function slotIndex(groups){
+  // the last word (across groups) that is a particle/preposition
+  for (let g = groups.length - 1; g >= 0; g--) { const w = groups[g].split(' '); for (let k = w.length - 1; k >= 0; k--) if (PARTS.has(w[k].toLowerCase())) return [g, k]; }
+  return null;
+}
+function buildChoice(m){
+  // word-order question sometimes, when a real template has a pronoun in the right place
+  const ti = Math.random() < .5 ? 0 : 1;
+  const tpl = m.t[ti]; const groups = groupsOf(tpl);
+  const slot = slotIndex(groups);
+  const correct = groups.join(' … ');
+  const accepted = new Set([norm(groups.join(' '))].concat(altsOf(m, ti).map(a => a.join(' '))));
+  const cands = [];
+  const excl = new Set((MC_EXCLUDE[m.ph.p] || []).concat(m.ph.p.split(' ').slice(1)));
+  if (slot) {
+    const cur = groups[slot[0]].split(' ')[slot[1]].toLowerCase();
+    const fromDb = PH.filter(p => p.b === m.ph.b && p !== m.ph).map(p => p.p.split(' ').pop()).filter(w => PARTS.has(w));
+    const list = shuffle([...new Set(fromDb)]).concat(shuffle(GENERIC));
+    for (const w of list) {
+      if (w === cur || excl.has(w)) continue;
+      const g2 = groups.map((g, gi) => gi === slot[0] ? g.split(' ').map((x, xi) => xi === slot[1] ? w : x).join(' ') : g);
+      const txt = g2.join(' … ');
+      if (accepted.has(norm(g2.join(' '))) || cands.includes(txt)) continue;
+      cands.push(txt); if (cands.length >= 3) break;
+    }
+  }
+  const opts = shuffle([correct].concat(cands.slice(0, 3)));
+  return {kind:'mc', tpl, groups, opts, correct};
+}
+function buildOrder(m){
+  // pronoun position: only from real templates
+  for (const tpl of shuffle(m.t)) {
+    const sep = tpl.match(/^(.*)\[(\w+)\] (it|them|him|her|me|us|you) \[(\w+)\](.*)$/);
+    if (sep && m.pos === '可拆開' && PARTS.has(sep[4])) {
+      const right = sep[1] + sep[2] + ' ' + sep[3] + ' ' + sep[4] + sep[5];
+      const wrong = sep[1] + sep[2] + ' ' + sep[4] + ' ' + sep[3] + sep[5];
+      return {kind:'order', opts:shuffle([right, wrong]), correct:right, note:'可拆開的片語，代名詞 (' + sep[3] + ') 要放在動詞和 particle 中間。'};
+    }
+    const ins = tpl.match(/^(.*)\[(\w+) (\w+)\] (it|them|him|me|us|you)\b(.*)$/);
+    if (ins && m.pos === '不可拆開' && PARTS.has(ins[3])) {
+      const right = ins[1] + ins[2] + ' ' + ins[3] + ' ' + ins[4] + ins[5];
+      const wrong = ins[1] + ins[2] + ' ' + ins[4] + ' ' + ins[3] + ins[5];
+      return {kind:'order', opts:shuffle([right, wrong]), correct:right, note:'這個片語不可拆開，代名詞 (' + ins[4] + ') 要放在整個片語後面。'};
+    }
+  }
+  return null;
+}
+function qChoice(m){
+  if (!S.q) S.q = (Math.random() < .2 && buildOrder(m)) || buildChoice(m);
+  const q = S.q, L = 'ABCD';
+  const answered = S.phase === 'fb';
+  let head;
+  if (q.kind === 'order') head = '<div class="qlabel">哪一句正確？</div><p class="qhint">片語：<b class="en">' + esc(m.ph.p) + '</b>(' + esc(m.zh) + ')</p>';
+  else {
+    const segs = parseT(q.tpl);
+    const sent = segs.map(s => s.ans == null ? esc(s.txt) : (answered ? '<span class="blank ok">' + esc(s.ans) + '</span>' : '<span class="blank" aria-label="空格">&nbsp;</span>')).join('');
+    head = '<div class="qlabel">選出正確答案</div><p class="qsent">' + sent + '</p><p class="qhint">提示：' + esc(m.zh) + '</p>';
+  }
+  const opts = q.opts.map((o, i) => {
+    let cls = '', lab = L[i];
+    if (answered) { if (o === q.correct) { cls = ' ok'; lab = ICON.ok; } else if (o === S.pick) { cls = ' bad'; lab = '✗'; } }
+    return '<button class="opt' + (q.kind === 'order' ? ' sent' : '') + cls + '" data-opt="' + i + '"' + (answered ? ' disabled' : '') + '><span class="ol">' + lab + '</span><span class="ot en">' + esc(o) + '</span></button>';
+  }).join('');
+  let fb = '';
+  if (answered) {
+    const ok = S.pick === q.correct;
+    fb = '<div class="fb ' + (ok ? 'good' : 'bad') + '" aria-live="polite"><h3>' + (ok ? '答對了！' : '學多一點！') + '</h3>' +
+      '<p><span class="ph en">' + esc(m.ph.p) + '</span> = ' + esc(m.zh) + '</p>' +
+      (q.kind === 'order' ? '<p>' + esc(q.note) + '</p>' : '') +
+      (m.pm !== '—' ? '<p><b class="en" style="color:var(--blue-dark)">' + esc(m.ph.g) + '</b> 在這裏有「' + esc(m.pm) + '」的意思。</p>' : '') +
+      (m.tip ? '<p style="font-size:15px">提示：' + esc(m.tip) + '</p>' : '') + '</div>' +
+      '<button class="b3d primary wide" data-act="next" id="go">' + (S.i + 1 >= S.items.length ? '看結果' : '下一題') + '</button>';
+  }
+  render(topbar() + '<main class="pbody"><div class="qcard">' + head + '</div><div class="opts">' + opts + '</div>' + fb + '</main>');
+  if (answered) focusSoon('#go');
+}
+function choiceAnswer(i){
+  const m = S.items[S.i]; S.pick = S.q.opts[i]; const ok = S.pick === S.q.correct;
+  setBox(m.id, ok); record(m, ok, {your:S.pick, right:S.q.correct}); S.phase = 'fb'; qChoice(m);
+}
+
+/* ---------- sentence fill-in ---------- */
+function fillDiagnose(m, exp, got){
+  // exp, got: arrays of words (one per box, already normalised)
+  const f = formsOf(m.ph.b === 'help' ? 'help' : m.ph.b), msg = new Set();
+  exp.forEach((e, i) => {
+    const g = got[i] || '';
+    if (g === e) return;
+    if (!g) { msg.add('有空格未填。'); return; }
+    if (PARTS.has(e) && PARTS.has(g)) { msg.add('Particle 用錯了。'); return; }
+    if ((f.all.has(e) && f.all.has(g)) || AUX.has(e) || AUX.has(g)) {
+      let t = '時態或動詞形式不對，留意句子中的時間線索。';
+      if (f.past.includes(e) && !f.pp.includes(e)) t = '要用過去式，留意句子中的時間線索。';
+      else if (f.pp.includes(e) && !f.past.includes(e)) t = '這裏要用過去分詞 (例如 have / has / was 之後)。';
+      else if (f.s.includes(e)) t = '主語是第三人稱單數，現在式動詞要加 s / es。';
+      else if (f.ing.includes(e)) t = '這裏要用 -ing 形式。';
+      else if (f.base.includes(e)) t = '這裏要用動詞原形。';
+      msg.add(t); return;
+    }
+    if (lev(e, g) <= 2) { msg.add('留意串字。'); return; }
+    msg.add('答案與正確答案不同，看看下面的正確答案。');
+  });
+  return [...msg];
+}
+function lev(a, b){ const d = []; for (let i = 0; i <= a.length; i++) { d[i] = [i]; } for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1)); return d[a.length][b.length]; }
+function hintWord(m){ const w = m.ph.p.split(' '); return [w[0]].concat(w.slice(1).map(x => PARTS.has(x) ? '＿＿' : x)).join(' '); }
+function qFill(m){
+  if (!S.q) S.q = {ti: Math.random() < .5 ? 0 : 1, hint:false, tries:0, typed:null};
+  const q = S.q, tpl = m.t[q.ti], segs = parseT(tpl);
+  const answered = S.phase === 'fb';
+  let boxN = 0, firstBox = true;
+  const sent = segs.map(s => {
+    if (s.ans == null) return esc(s.txt);
+    const words = s.ans.split(' ');
+    firstBox = false;
+    return words.map(w => {
+      const id = boxN++;
+      const val = q.typed ? q.typed[id] || '' : '';
+      const st = answered ? (q.boxOk[id] ? ' ok' : ' bad') : '';
+      const width = 6;
+      return '<input class="wbox en' + st + '" data-box="' + id + '" style="width:' + width + 'ch" type="text" value="' + esc(val) + '" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="第 ' + (id + 1) + ' 個字"' + (answered ? ' readonly' : '') + '>';
+    }).join(' ');
+  }).join('');
+  let hint = '';
+  if (q.hint && !answered) {
+    const pw = groupsOf(tpl).join(' ').split(' ').filter(w => PARTS.has(w.toLowerCase()));
+    hint = '<p class="qhint">提示：' + esc(m.zh) + (pw.length ? '<br>Particle 的第一個字母：<b class="en">' + esc(pw.map(w => w[0] + '…').join(' ')) + '</b>' : '') + '</p>';
+  }
+  let body = '<div class="qcard"><div class="qlabel">用括號內的動詞和適當的 particle 完成句子，留意時態。每格填一個字。</div><p class="qsent en">' + sent + '</p><p class="en" style="font-size:18px;font-weight:700;color:var(--muted)">(' + esc(hintWord(m)) + ')</p>' + hint + '</div>';
+  if (!answered) {
+    body += '<div class="row2"><button class="b3d" data-act="hint"' + (q.hint ? ' disabled' : '') + '>提示</button><button class="b3d primary" data-act="check">核對</button></div>';
+  } else {
+    const ok = q.ok;
+    body += '<div class="fb ' + (ok ? 'good' : 'bad') + '" aria-live="polite"><h3>' + (ok ? '答對了！' : '學多一點！') + '</h3>' +
+      (ok ? '' : '<p>正確答案：<b class="en" style="color:var(--good-dark)">' + esc(groupsOf(tpl).join(' … ')) + '</b></p>' + (q.msgs.length ? '<ul>' + q.msgs.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '')) +
+      '<p class="en" style="font-size:16px">' + sentHtml(tpl) + '</p>' +
+      '<p><span class="ph en">' + esc(m.ph.p) + '</span> = ' + esc(m.zh) + '</p>' +
+      (m.pm !== '—' ? '<p style="font-size:15px"><b class="en" style="color:var(--blue-dark)">' + esc(m.ph.g) + '</b> 在這裏有「' + esc(m.pm) + '」的意思。</p>' : '') +
+      (m.tip ? '<p style="font-size:15px">提示：' + esc(m.tip) + '</p>' : '') + '</div>' +
+      (ok ? '<button class="b3d primary wide" data-act="next" id="go">' + (S.i + 1 >= S.items.length ? '看結果' : '下一題') + '</button>'
+          : '<div class="row2"><button class="b3d" data-act="retry">再試一次</button><button class="b3d primary" data-act="next" id="go">' + (S.i + 1 >= S.items.length ? '看結果' : '下一題') + '</button></div>');
+  }
+  render(topbar() + '<main class="pbody">' + body + '</main>');
+  if (!answered) { const first = app.querySelector('.wbox'); if (first) focusSoon(first); } else focusSoon('#go');
+}
+function fillCheck(){
+  const m = S.items[S.i], q = S.q, tpl = m.t[q.ti];
+  const inputs = [...app.querySelectorAll('.wbox')];
+  const typed = inputs.map(x => x.value);
+  if (!typed.some(v => v.trim())) { focusSoon(inputs[0]); return; }
+  q.typed = typed;
+  const groups = groupsOf(tpl);
+  // split typed words back into their groups
+  let k = 0; const tg = groups.map(g => { const n = g.split(' ').length; const part = typed.slice(k, k + n); k += n; return part; });
+  const tgNorm = tg.map(part => norm(part.join(' ')));
+  const expNorm = groups.map(norm);
+  const alts = altsOf(m, q.ti);
+  let ok = tgNorm.every((t, i) => t === expNorm[i]) || alts.some(a => a.length === tgNorm.length && a.every((x, i) => x === tgNorm[i]));
+  // box-level marks
+  const expWords = groups.join(' ').split(' ').map(norm);
+  q.boxOk = ok ? typed.map(() => true) : typed.map((t, i) => norm(t) === expWords[i]);
+  q.msgs = ok ? [] : fillDiagnose(m, expWords, typed.map(norm));
+  q.ok = ok;
+  if (q.tries === 0) { setBox(m.id, ok, q.hint); record(m, ok, {your:typed.join(' '), right:groups.join(' … ')}); }
+  q.tries++;
+  S.phase = 'fb'; qFill(m);
+}
+
+/* ---------- particle meaning quiz ---------- */
+function qPm(m){
+  if (!S.q) {
+    const tags = PM[m.ph.g] || [];
+    const others = shuffle(tags.filter(t => t !== m.pm)).slice(0, 3);
+    S.q = {opts: shuffle([m.pm].concat(others)), tpl: m.t[Math.random() < .5 ? 0 : 1]};
+  }
+  const q = S.q, answered = S.phase === 'fb';
+  const opts = q.opts.map((o, i) => {
+    let cls = '', lab = String(i + 1);
+    if (answered) { if (o === m.pm) { cls = ' ok'; lab = ICON.ok; } else if (o === S.pick) { cls = ' bad'; lab = '✗'; } }
+    return '<button class="opt' + cls + '" data-pm="' + i + '"' + (answered ? ' disabled' : '') + '><span class="ol">' + lab + '</span><span class="ot">' + esc(o) + '</span></button>';
+  }).join('');
+  let fb = '';
+  if (answered) {
+    const ok = S.pick === m.pm;
+    const same = MEAN.filter(x => x.ph.g === m.ph.g && x.pm === m.pm && x.ph !== m.ph && inLevels(x.ph)).slice(0, 4);
+    fb = '<div class="fb ' + (ok ? 'good' : 'bad') + '" aria-live="polite"><h3>' + (ok ? '答對了！' : '學多一點！') + '</h3>' +
+      '<p><span class="ph en">' + esc(m.ph.p) + '</span> = ' + esc(m.zh) + '</p><p><b class="en" style="color:var(--blue-dark)">' + esc(m.ph.g) + '</b> 在這裏有「' + esc(m.pm) + '」的意思。</p>' +
+      (same.length ? '<p style="font-size:15px">同樣意思的例子：' + same.map(x => '<b class="en">' + esc(x.ph.p) + '</b> (' + esc(x.zh) + ')').join('、') + '</p>' : '') + '</div>' +
+      '<button class="b3d primary wide" data-act="next" id="go">' + (S.i + 1 >= S.items.length ? '看結果' : '下一題') + '</button>';
+  }
+  render(topbar() + '<main class="pbody"><div class="qcard" style="' + pvar(m.ph.g) + '"><div class="qlabel">句子中的 <b class="en" style="color:var(--pc)">' + esc(m.ph.g) + '</b> 是甚麼意思？</div><p class="qsent en">' + sentHtml(q.tpl) + '</p></div><div class="opts">' + opts + '</div>' + fb + '</main>');
+  if (answered) focusSoon('#go');
+}
+function pmAnswer(i){ const m = S.items[S.i]; S.pick = S.q.opts[i]; const ok = S.pick === m.pm; setBox(m.id, ok); record(m, ok, {your:S.pick, right:m.pm}); S.phase = 'fb'; qPm(m); }
+
+/* ---------- results ---------- */
+function results(){
+  VIEW = 'results';
+  const total = S.res.length, ok = S.res.filter(r => r.ok).length;
+  const missed = S.res.filter(r => !r.ok);
+  const msg = ok === total ? '全部答對！可以換一個範圍再試。' : ok / total >= .7 ? '做得好！再溫習 ' + (total - ok) + ' 個就全部掌握了。' : '多練幾次就會熟。答錯的片語稍後會再出現。';
+  const byG = {};
+  S.res.forEach(r => { const g = (r.item.ph || r.item).g; byG[g] = byG[g] || [0, 0]; byG[g][1]++; if (r.ok) byG[g][0]++; });
+  const bars = GROUPS.filter(g => byG[g]).map(g => { const c = PCOL[g]; const [a, b] = byG[g];
+    return '<div class="statrow"><b class="en" style="color:' + c[0] + '">' + esc(g) + '</b><div class="bar"><i style="width:' + (a / b * 100) + '%;background:' + c[1] + '"></i></div><span style="text-align:right;font-weight:700">' + a + '/' + b + '</span></div>'; }).join('');
+  const missHtml = missed.map(r => {
+    const it = r.item, p = it.ph || it, zh = it.ph ? it.zh : it.m.map(x => x.zh).join('；');
+    return '<div class="miss"><div class="mh"><b class="en">' + esc(p.p) + '</b><span class="muted">' + esc(zh) + '</span></div>' +
+      (r.your != null ? '<div style="font-size:16px">你的答案：<span class="strike en">' + esc(r.your || '—') + '</span>　正確：<b class="en" style="color:var(--good-dark)">' + esc(r.right) + '</b></div>' : '') + '</div>';
+  }).join('');
+  render('<header class="page-head" style="justify-content:space-between"><h1>練習完成！</h1><span class="muted" style="font-size:13px;font-weight:700">' + esc(MODE_NAME[S.mode]) + '</span></header>' +
+    '<main class="pbody" style="padding-top:20px"><div class="score"><div style="font-size:13px;font-weight:700;color:var(--sun-ink)">你的分數</div><div class="num">' + ok + ' <span style="font-size:30px;color:var(--sun-ink)">/ ' + total + '</span></div><div>' + esc(msg) + '</div></div>' +
+    (bars ? '<h2 style="font-size:19px">各個 particle</h2><div style="display:flex;flex-direction:column;gap:10px">' + bars + '</div>' : '') +
+    (missed.length ? '<h2 style="font-size:19px">要再溫習</h2>' + missHtml : '') +
+    (missed.length ? '<button class="b3d primary wide" data-act="redo">再練錯了的題目</button>' : '') +
+    '<button class="b3d wide" data-act="again">再來一輪</button><button class="b3d wide" data-go="home">返回首頁</button></main>');
+  S.missedItems = missed.map(r => r.item);
+}
+
+/* ---------- browse ---------- */
+function browse(focusSearch){
+  VIEW = 'browse'; S = null;
+  const q = B.q.trim().toLowerCase();
+  let list = PH.filter(p => (B.lv === 'all' || (B.lv === 'sel' ? inLevels(p) : p.lv === +B.lv)) && (!B.g || p.g === B.g));
+  if (q) list = list.filter(p => (p.p + ' ' + p.m.map(m => m.zh + ' ' + m.en).join(' ')).toLowerCase().includes(q));
+  const chipsLv = [['sel','已選程度'],['all','全部']].concat(LV.map((l, i) => [String(i), l]));
+  const rows = list.map(p => {
+    const st = stats(p.m), d = st.m === p.m.length ? 'm' : (st.m || st.l) ? 'l' : '';
+    const open = B.open === p.id;
+    const zh = p.m.map(m => m.zh).join('；');
+    return '<div class="vrow" style="' + pvar(p.g) + '"><button class="vhead" data-open="' + p.id + '" aria-expanded="' + open + '"><span style="display:flex;flex-direction:column;gap:2px;min-width:0"><b class="en">' + bigPhrase(p) + '</b><span class="vz' + (B.cover && !open ? ' hide' : '') + '"><span class="dot ' + d + '"></span>' + esc(zh) + '</span></span><span class="lvl">' + LV[p.lv] + '</span></button>' +
+      (open ? '<div class="vmore"><div style="display:flex;align-items:center;gap:8px"><span class="ptag">' + esc(p.g) + '</span><span class="muted" style="font-size:13px">' + esc(p.m[0].ty) + '</span><span style="flex:1"></span>' + sayBtn(p.p) + '</div>' +
+        p.m.map(m => meaningBlock(m, p.m.length > 1) + '<div class="kv"><b>及物性</b>' + esc(m.tr) + '　<b>賓語位置</b>' + esc(m.pos) + '</div>').join('<hr style="border:0;border-top:2px dashed var(--line);margin:0">') + '</div>' : '') + '</div>';
+  }).join('');
+  render('<header class="page-head"><h1>查表 · ' + list.length + ' 個片語</h1></header>' +
+    '<main class="pbody" style="padding-top:16px"><input class="search en" id="search" type="search" placeholder="搜尋片語或中文意思" value="' + esc(B.q) + '" aria-label="搜尋片語或中文意思">' +
+    '<div class="chips" role="group" aria-label="程度">' + chipsLv.map(c => '<button class="chip" data-blv="' + c[0] + '" aria-pressed="' + (B.lv === c[0]) + '">' + c[1] + '</button>').join('') + '</div>' +
+    '<div class="chips" role="group" aria-label="Particles"><button class="chip" data-bg="" aria-pressed="' + !B.g + '">全部 particles</button>' + GROUPS.map(g => '<button class="chip en" data-bg="' + esc(g) + '" aria-pressed="' + (B.g === g) + '">' + esc(g) + '</button>').join('') + '</div>' +
+    '<label class="check"><input type="checkbox" id="cover"' + (B.cover ? ' checked' : '') + '><span>遮蓋中文意思 (點一下片語顯示)</span></label>' +
+    '<div class="vlist">' + (rows || '<div class="empty">找不到符合的片語。</div>') + '</div></main><div class="spacer"></div>' + nav('browse'));
+  if (focusSearch) focusSoon('#search');
+}
+
+/* ---------- particles (lesson) ---------- */
+function particles(){
+  VIEW = 'particles'; S = null;
+  const rows = GROUPS.filter(g => g !== '其他').map(g => '<button class="prow" style="' + pvar(g) + '" data-pl="' + g + '" aria-pressed="false"><span class="pw">' + g + '</span><span class="pd">' + esc((PM[g] || []).join(' · ')) + '</span><span class="pn">' + PH.filter(p => p.g === g).length + '</span><span></span></button>').join('');
+  const n = poolMeanings().filter(m => m.pm !== '—' && m.ph.g !== '其他').length;
+  render('<header class="page-head"><button class="x-btn" data-go="home" aria-label="返回">' + ICON.back + '</button><h1><span style="font-weight:900;color:var(--good)">Particle</span> 意思</h1></header>' +
+    '<main class="pbody" style="padding-top:18px"><p style="font-size:16px">同一個 particle 常有幾個意思。明白這些意思，見到新的片語也較容易估到意思。選一個 particle 看看：</p>' +
+    '<div class="plist">' + rows + '</div>' +
+    '<button class="b3d primary wide" data-act="pmall"' + (n ? '' : ' disabled') + '>小測驗：已選程度的所有 particles (' + n + ' 題)</button></main><div class="spacer"></div>' + nav('home'));
+}
+function particleDetail(g){
+  VIEW = 'pdetail'; S = null;
+  const tags = PM[g] || [];
+  const cards = tags.map((t, i) => {
+    const seen = new Set(); const ex = MEAN.filter(m => m.ph.g === g && m.pm === t).sort((a, b) => a.ph.lv - b.ph.lv).filter(m => !seen.has(m.ph.p) && seen.add(m.ph.p)).slice(0, 4);
+    return '<div class="meaning-card"><div class="mt"><span>' + (i + 1) + '</span><b>' + esc(t) + '</b></div><div class="egs">' + ex.map(m => '<span><b class="en">' + esc(m.ph.p) + '</b><small>' + esc(m.zh) + '</small></span>').join('') + '</div></div>';
+  }).join('');
+  const list = MEAN.filter(m => m.ph.g === g && m.pm !== '—' && inLevels(m.ph));
+  const seenO = new Set(); const other = MEAN.filter(m => m.ph.g === g && m.pm === '—').filter(m => !seenO.has(m.ph.p) && seenO.add(m.ph.p)).slice(0, 6);
+  render('<header class="page-head"><button class="x-btn" data-go="particles" aria-label="返回">' + ICON.back + '</button><h1><span style="font-weight:900;color:var(--good)">Particle</span> 意思</h1></header>' +
+    '<main class="pbody" style="padding-top:18px;' + pvar(g) + '"><div style="display:flex;align-items:center;gap:16px"><span style="width:72px;height:72px;border-radius:20px;background:var(--pb);border:2px solid var(--pc);display:grid;place-items:center;box-shadow:0 4px 0 var(--pc);font-size:30px;font-weight:900;color:var(--pc)" class="en">' + esc(g) + '</span>' +
+    '<div><div style="font-size:40px;font-weight:900;line-height:1;color:var(--pc)" class="en">' + esc(g) + '</div><div class="muted" style="font-size:15px">有 ' + tags.length + ' 個常見意思</div></div></div>' + cards +
+    (other.length ? '<div class="card"><h2 style="font-size:16px">特別的意思 (要個別記)</h2><div class="egs">' + other.map(m => '<span><b class="en">' + esc(m.ph.p) + '</b><small>' + esc(m.zh) + '</small></span>').join('') + '</div></div>' : '') +
+    '<button class="b3d primary wide" data-act="pmone" data-g="' + esc(g) + '"' + (list.length ? '' : ' disabled') + '>練習 ' + esc(g) + ' 的意思 (' + list.length + ' 題)</button>' +
+    '<button class="b3d wide" data-act="pmchoice" data-g="' + esc(g) + '">用選擇題練習 ' + esc(g) + ' 的片語</button></main>');
+}
+
+/* ---------- progress ---------- */
+function progress(){
+  VIEW = 'progress'; S = null;
+  const all = stats(MEAN), tot = MEAN.length;
+  const lvRows = LV.map((l, i) => { const ms = MEAN.filter(m => m.ph.lv === i), st = stats(ms), n = ms.length;
+    return '<div class="statrow"><b style="font-size:14px">' + l + '</b><div class="bar"><i style="width:' + (st.m / n * 100) + '%;background:var(--good)"></i><i style="width:' + (st.l / n * 100) + '%;background:#E0A100"></i></div><span style="text-align:right;font-weight:700">' + st.m + '/' + n + '</span></div>'; }).join('');
+  const gRows = GROUPS.map(g => { const ms = MEAN.filter(m => m.ph.g === g), st = stats(ms), n = ms.length, c = PCOL[g];
+    return '<div class="statrow"><b class="en" style="color:' + c[0] + '">' + esc(g) + '</b><div class="bar"><i style="width:' + (st.m / n * 100) + '%;background:var(--good)"></i><i style="width:' + (st.l / n * 100) + '%;background:#E0A100"></i></div><span style="text-align:right;font-weight:700">' + st.m + '/' + n + '</span></div>'; }).join('');
+  const weak = MEAN.filter(m => DB.box[m.id] && DB.box[m.id].wrong).sort((a, b) => (DB.box[b.id].wrong - DB.box[a.id].wrong) || (boxOf(a.id) - boxOf(b.id))).slice(0, 12);
+  render('<header class="page-head"><h1>進度</h1></header><main class="pbody" style="padding-top:18px">' +
+    '<div class="card"><h2>整體 · ' + tot + ' 個意思</h2><div class="bar" role="img" aria-label="已掌握 ' + all.m + '，練習中 ' + all.l + '，未練習 ' + all.n + '"><i style="width:' + (all.m / tot * 100) + '%;background:var(--good)"></i><i style="width:' + (all.l / tot * 100) + '%;background:#E0A100"></i></div>' +
+    '<div class="legend"><span style="--c:var(--good)">已掌握 ' + all.m + '</span><span style="--c:#E0A100">練習中 ' + all.l + '</span><span style="--c:#D3DAE3">未練習 ' + all.n + '</span></div><p class="muted" style="font-size:13px">連續答對幾次就會算作「已掌握」。答錯的片語會更常出現。</p></div>' +
+    '<div class="card"><h2>按程度</h2>' + lvRows + '</div><div class="card"><h2>按 particle</h2>' + gRows + '</div>' +
+    (weak.length ? '<div class="card"><h2>最常答錯</h2>' + weak.map(m => '<div class="mh" style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b class="en" style="font-size:17px">' + esc(m.ph.p) + '</b><span class="muted">' + esc(m.zh) + '</span><span style="flex:1"></span><span style="font-size:13px;color:var(--bad);font-weight:700">錯 ' + DB.box[m.id].wrong + ' 次</span></div>').join('') +
+      '<button class="b3d primary wide" data-act="weak">練習這些片語 (選擇題)</button></div>' : '') +
+    '<p class="muted" style="font-size:13px">進度只保存在這部裝置的瀏覽器內。</p></main><div class="spacer"></div>' + nav('progress'));
+}
+
+/* ---------- settings ---------- */
+function settings(){
+  VIEW = 'settings'; S = null;
+  render('<header class="page-head"><h1>設定</h1></header><main class="pbody" style="padding-top:18px">' +
+    '<div class="card"><h2>每次練習的題數</h2><div class="seg" role="group" aria-label="題數">' + [10, 20, 0].map(x => '<button class="b3d" data-count="' + x + '" aria-pressed="' + (SET.count === x) + '">' + (x || '全部') + '</button>').join('') + '</div></div>' +
+    '<div class="card"><h2>出題方式</h2><label class="check"><input type="checkbox" id="focus"' + (SET.focus ? ' checked' : '') + '><span>優先練習較弱的片語 (建議開啟)</span></label></div>' +
+    '<div class="card"><h2>清除進度</h2><p style="font-size:15px">清除這部裝置上的所有練習紀錄。這個動作不能還原。</p><button class="b3d wide" data-act="reset" id="reset">清除進度</button></div>' +
+    '<p class="muted" style="font-size:13px">資料版本 ' + esc(D.version) + ' · 共 ' + PH.length + ' 個片語、' + MEAN.length + ' 個意思</p></main><div class="spacer"></div>' + nav('settings'));
+}
+
+/* ---------- routing ---------- */
+function go(v, opt){
+  if (v === 'home') return home();
+  if (v === 'browse') return browse(opt);
+  if (v === 'progress') return progress();
+  if (v === 'settings') return settings();
+  if (v === 'particles') return particles();
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('button, [data-open]'); if (!t || t.disabled) return;
+  const d = t.dataset;
+  if (d.say) return say(d.say);
+  if (d.go) return go(d.go, d.focus === 'search');
+  if (d.lv !== undefined) { const i = +d.lv; SET.levels = SET.levels.includes(i) ? SET.levels.filter(x => x !== i) : SET.levels.concat(i); save(); return home(); }
+  if (d.part !== undefined) { const g = d.part; SET.parts = SET.parts.includes(g) ? SET.parts.filter(x => x !== g) : SET.parts.concat(g); save(); return home(); }
+  if (d.mode) return start(d.mode);
+  if (d.opt !== undefined) return choiceAnswer(+d.opt);
+  if (d.pm !== undefined) return pmAnswer(+d.pm);
+  if (d.pl) return particleDetail(d.pl);
+  if (d.open !== undefined) { B.open = B.open === d.open ? null : d.open; return browse(); }
+  if (d.blv !== undefined) { B.lv = d.blv; return browse(); }
+  if (d.bg !== undefined) { B.g = d.bg; return browse(); }
+  if (d.count !== undefined) { SET.count = +d.count; save(); return settings(); }
+  switch (d.act) {
+    case 'allparts': showAllParts = true; return home();
+    case 'lessparts': showAllParts = false; return home();
+    case 'clearparts': SET.parts = []; save(); return home();
+    case 'exit': return S && S.res.length ? results() : home();
+    case 'fyes': return flashAnswer(true);
+    case 'fno': return flashAnswer(false);
+    case 'next': return next();
+    case 'hint': S.q.hint = true; S.q.typed = [...app.querySelectorAll('.wbox')].map(x => x.value); return qFill(S.items[S.i]);
+    case 'check': return fillCheck();
+    case 'retry': S.phase = 'ask'; S.q.typed = null; return qFill(S.items[S.i]);
+    case 'redo': return start(S.mode, {items: shuffle(S.missedItems), label: S.label});
+    case 'again': return start(S.mode, S.label ? {items: shuffle(S.items), label: S.label} : null);
+    case 'pmall': return start('pmq');
+    case 'pmone': { const g = d.g; return start('pmq', {list: MEAN.filter(m => m.ph.g === g && m.pm !== '—' && inLevels(m.ph)), label: g}); }
+    case 'pmchoice': { const g = d.g; const list = MEAN.filter(m => m.ph.g === g && inLevels(m.ph)); return start('choice', {items: choose(list, m => boxOf(m.id)), label: g}); }
+    case 'weak': { const list = MEAN.filter(m => DB.box[m.id] && DB.box[m.id].wrong).sort((a, b) => DB.box[b.id].wrong - DB.box[a.id].wrong).slice(0, SET.count || 12); return start('choice', {items: shuffle(list), label: '最常答錯'}); }
+    case 'reset':
+      if (t.dataset.confirm !== '1') { t.dataset.confirm = '1'; t.textContent = '再按一次確認清除'; t.classList.add('primary'); return; }
+      DB.box = {}; save(); return settings();
+  }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'search') { B.q = e.target.value; const pos = e.target.selectionStart; browse(); const s = app.querySelector('#search'); if (s) { s.focus(); try { s.setSelectionRange(pos, pos); } catch(_){} } }
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'cover') { B.cover = e.target.checked; return browse(); }
+  if (e.target.id === 'focus') { SET.focus = e.target.checked; save(); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const box = e.target.closest && e.target.closest('.wbox');
+  if (box && !box.readOnly) {
+    e.preventDefault();
+    const all = [...app.querySelectorAll('.wbox')]; const i = all.indexOf(box);
+    if (i < all.length - 1) all[i + 1].focus(); else fillCheck();
+  }
+});
+home();
+})();
+</script>
+</body>
+</html>
