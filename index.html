@@ -785,7 +785,13 @@ document.addEventListener('click', e => {
   if (d.opt !== undefined) return choiceAnswer(+d.opt);
   if (d.pm !== undefined) return pmAnswer(+d.pm);
   if (d.pl) return particleDetail(d.pl);
-  if (d.open !== undefined) { B.open = B.open === d.open ? null : d.open; return browse(); }
+  if (d.open !== undefined) {
+    const top = t.getBoundingClientRect().top;
+    B.open = B.open === d.open ? null : d.open; browse();
+    const nh = app.querySelector('[data-open="' + d.open + '"]');
+    if (nh) window.scrollTo(0, window.scrollY + nh.getBoundingClientRect().top - top);
+    return;
+  }
   if (d.blv !== undefined) { B.lv = d.blv; return browse(); }
   if (d.bg !== undefined) { B.g = d.bg; return browse(); }
   if (d.count !== undefined) { SET.count = +d.count; save(); return settings(); }
