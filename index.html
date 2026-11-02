@@ -162,6 +162,12 @@ h1,h2,h3,p{margin:0}
 .vmore{border-top:2px dashed var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:14px;background:#FFFEFA}
 .kv{font-size:15px;line-height:1.55}
 .kv b{font-weight:800;color:var(--amber);margin-right:6px}
+.kvw{display:flex;flex-direction:column;gap:8px}
+.kv .info{background:none;border:0;padding:6px;margin:-6px 2px -6px -2px;vertical-align:middle;cursor:pointer}
+.kv .info span{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--amber);color:var(--amber);font:800 12px/1 Georgia,serif;font-style:italic}
+.kv .info[aria-expanded="true"] span{background:var(--amber);color:#fff}
+.infobox{font-size:14px;line-height:1.6;background:#FFF4E6;border-left:4px solid var(--amber);border-radius:8px;padding:8px 12px;color:var(--ink)}
+.infobox b{color:var(--amber)}
 .note b.lbl{color:var(--amber);font-weight:800}
 .vhead b .vb{color:var(--blue)}
 .card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -687,6 +693,27 @@ function results(){
   S.missedItems = missed.map(r => r.item);
 }
 
+/* ---------- 及物性 / 賓語位置 explanations ---------- */
+const INFO = {
+  tr: ['及物性 = 片語後面要不要接賓語（人或事物）。', {
+    '及物': '<b>及物</b>：後面一定要有賓語。例：<span class="en">pick up the book</span>',
+    '不及物': '<b>不及物</b>：後面不可以直接加賓語。例：<span class="en">The plane took off.</span>',
+    '兩者皆可': '<b>兩者皆可</b>：可以有賓語，也可以沒有。例：<span class="en">Cheer up! / Cheer him up.</span>',
+    '—': '<b>—</b>：這不是 phrasal verb，所以不分及物或不及物。這類片語後面通常一定要有賓語，請看句型。'}],
+  pos: ['賓語位置 = 賓語（人或事物）要放在片語的哪裏。', {
+    '可拆開': '<b>可拆開</b>：賓語可以放在 particle 前面或後面：<span class="en">turn off the light / turn the light off</span>。如果賓語是 <span class="en">it、them</span> 等代名詞，一定要放在中間：<span class="en">turn it off</span> ✓　<span class="en">turn off it</span> ✗',
+    '不可拆開': '<b>不可拆開</b>：賓語一定放在整個片語後面：<span class="en">look after her</span> ✓　<span class="en">look her after</span> ✗',
+    '賓語在中間': '<b>賓語在中間</b>：賓語（通常是人）放在動詞後面、particle 前面：<span class="en">forgive me for being late / show them around</span>',
+    '可有中間賓語': '<b>可有中間賓語</b>：動詞後面可以加一個賓語，也可以不加：<span class="en">ask for help / ask him for help</span>',
+    '—': '<b>—</b>：這個片語沒有賓語，所以不用看賓語位置。',
+    '固定詞組；兩種詞序見句型': '<b>固定詞組</b>：這個片語有兩種詞序，請看上面的句型。'}]
+};
+const infoBtn = k => '<button class="info" data-info="' + k + '" aria-expanded="false" aria-label="解釋"><span>i</span></button>';
+function kvBlock(m){
+  const box = (k, v) => '<div class="infobox" data-k="' + k + '" hidden>' + INFO[k][0] + '<br>' + (INFO[k][1][v] || '') + '</div>';
+  return '<div class="kvw"><div class="kv"><b>及物性</b>' + esc(m.tr) + infoBtn('tr') + '　<b>賓語位置</b>' + esc(m.pos) + infoBtn('pos') + '</div>' + box('tr', m.tr) + box('pos', m.pos) + '</div>';
+}
+
 /* ---------- browse ---------- */
 function browse(focusSearch){
   VIEW = 'browse'; S = null;
@@ -700,7 +727,7 @@ function browse(focusSearch){
     const zh = p.m.map(m => m.zh).join('；');
     return '<div class="vrow" style="' + pvar(p.g) + '"><button class="vhead" data-open="' + p.id + '" aria-expanded="' + open + '"><span style="display:flex;flex-direction:column;gap:2px;min-width:0"><b class="en">' + bigPhrase(p) + '</b><span class="vz' + (B.cover && !open ? ' hide' : '') + '"><span class="dot ' + d + '"></span>' + esc(zh) + '</span></span><span class="lvl">' + LV[p.lv] + '</span></button>' +
       (open ? '<div class="vmore"><div style="display:flex;align-items:center;gap:8px"><span class="ptag">' + esc(p.g) + '</span><span class="muted" style="font-size:13px">' + esc(p.m[0].ty) + '</span><span style="flex:1"></span>' + sayBtn(p.p) + '</div>' +
-        p.m.map(m => meaningBlock(m, p.m.length > 1) + '<div class="kv"><b>及物性</b>' + esc(m.tr) + '　<b>賓語位置</b>' + esc(m.pos) + '</div>').join('<hr style="border:0;border-top:2px dashed var(--line);margin:0">') + '</div>' : '') + '</div>';
+        p.m.map(m => meaningBlock(m, p.m.length > 1) + kvBlock(m)).join('<hr style="border:0;border-top:2px dashed var(--line);margin:0">') + '</div>' : '') + '</div>';
   }).join('');
   render('<header class="page-head"><h1>查表 · ' + list.length + ' 個片語</h1></header>' +
     '<main class="pbody" style="padding-top:16px"><input class="search en" id="search" type="search" placeholder="搜尋片語或中文意思" value="' + esc(B.q) + '" aria-label="搜尋片語或中文意思">' +
@@ -779,6 +806,12 @@ function go(v, opt){
 document.addEventListener('click', e => {
   const t = e.target.closest('button, [data-open]'); if (!t || t.disabled) return;
   const d = t.dataset;
+  if (d.info) {
+    const w = t.closest('.kvw');
+    w.querySelectorAll('.infobox').forEach(x => { x.hidden = x.dataset.k !== d.info ? true : !x.hidden; });
+    w.querySelectorAll('.info').forEach(b => b.setAttribute('aria-expanded', !w.querySelector('.infobox[data-k="' + b.dataset.info + '"]').hidden));
+    return;
+  }
   if (d.say) return say(d.say);
   if (d.go) return go(d.go, d.focus === 'search');
   if (d.lv !== undefined) { const i = +d.lv; SET.levels = SET.levels.includes(i) ? SET.levels.filter(x => x !== i) : SET.levels.concat(i); save(); return home(); }
