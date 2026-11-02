@@ -161,7 +161,9 @@ h1,h2,h3,p{margin:0}
 .dot.l{background:#E0A100}.dot.m{background:var(--good)}
 .vmore{border-top:2px dashed var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:14px;background:#FFFEFA}
 .kv{font-size:15px;line-height:1.55}
-.kv b{font-weight:700;color:var(--muted);margin-right:6px}
+.kv b{font-weight:800;color:var(--amber);margin-right:6px}
+.note b.lbl{color:var(--amber);font-weight:800}
+.vhead b .vb{color:var(--blue)}
 .card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
 .card h2{font-size:18px;font-weight:800}
 .bar{display:flex;height:12px;border-radius:99px;overflow:hidden;background:#EFE8D2}
@@ -357,7 +359,7 @@ function hlEx(ex, ph){
 }
 function bigPhrase(ph){
   const w = ph.p.split(' ');
-  return esc(w[0]) + ' ' + w.slice(1).map(x => PARTS.has(x) ? '<u style="color:var(--pc)">' + esc(x) + '</u>' : esc(x)).join(' ');
+  return '<span class="vb">' + esc(w[0]) + '</span> ' + w.slice(1).map(x => PARTS.has(x) ? '<u style="color:var(--pc)">' + esc(x) + '</u>' : esc(x)).join(' ');
 }
 
 /* ---------- state ---------- */
@@ -450,7 +452,7 @@ function meaningBlock(m, showN){
   return '<div class="mean"><div class="mh">' + (showN ? '<span class="mn">' + m.n + '</span>' : '') + '<span class="mz">' + esc(m.zh) + '</span>' + (m.pm !== '—' ? '<span class="ptag" style="' + pvar(m.ph.g) + '">' + esc(m.ph.g) + ' = ' + esc(m.pm) + '</span>' : '') + '</div>' +
     '<div class="pat en">' + esc(m.pat) + '</div>' +
     '<p class="ex">' + hlEx(m.ex, m.ph) + '</p>' +
-    (m.col ? '<div class="note"><b>常用搭配：</b><span class="en">' + esc(m.col) + '</span></div>' : '') +
+    (m.col ? '<div class="note"><b class="lbl">常用搭配：</b><span class="en">' + esc(m.col) + '</span></div>' : '') +
     (m.rel ? '<div class="note">' + esc(m.rel) + '</div>' : '') +
     (m.tip ? '<div class="note">提示：' + esc(m.tip) + '</div>' : '') + '</div>';
 }
