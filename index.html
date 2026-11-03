@@ -139,6 +139,20 @@ h1,h2,h3,p{margin:0}
 .mean .note{font-size:14px;color:#3E3A2A}
 .ptag{font-size:13px;font-weight:700;border-radius:99px;padding:3px 12px;border:2px solid var(--pl);background:var(--pb);color:var(--pc);display:inline-block}
 .ask{text-align:center;font-size:17px;color:var(--muted)}
+.fcard .hintline{font-size:16px;color:#5A5440}
+.gap{display:inline-block;min-width:2.6em;border-bottom:4px solid #F0A23B;margin:0 .08em;vertical-align:baseline}
+.big .gap{min-width:2.2em;height:.9em}
+.ex .gap{height:1em}
+.b3d.nob{border-color:var(--bad);background:var(--red);color:#fff;box-shadow:0 4px 0 var(--bad)}
+.b3d.nob:active{box-shadow:0 2px 0 var(--bad)}
+.b3d.yesb{border-color:var(--good-dark);background:var(--good);color:#fff;box-shadow:0 4px 0 var(--good-dark)}
+.b3d.yesb:active{box-shadow:0 2px 0 var(--good-dark)}
+.dirs{display:flex;flex-direction:column;gap:12px}
+.dir{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:14px 16px;min-height:76px}
+.dir b{font-size:19px}
+.dir span{font-size:15px;font-weight:600;color:var(--muted)}
+.dir[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft);box-shadow:0 4px 0 var(--blue)}
+.dir[aria-pressed="true"] b{color:var(--blue-dark)}
 
 /* lists / pages */
 .page-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:2px solid var(--line)}
@@ -291,7 +305,7 @@ function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || {}; } cat
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){ memStore = DB; } }
 const DB = load();
 DB.box = DB.box || {};
-DB.set = Object.assign({levels:[0], parts:[], count:10, focus:true}, DB.set || {});
+DB.set = Object.assign({levels:[0], parts:[], count:10, focus:true, fdir:'part'}, DB.set || {});
 const SET = DB.set;
 const boxOf = id => (DB.box[id] && DB.box[id].b) || 0;
 function setBox(id, ok, hint){
@@ -442,6 +456,7 @@ function start(mode, opts){
   else items = choose(poolMeanings(), m => boxOf(m.id));
   if (!items.length) { alertBox('這個範圍沒有可以練習的題目。'); return; }
   S = {mode, items, i:0, res:[], phase:'ask', label:opts.label || null};
+  if (mode === 'flash') { const fd = SET.fdir || 'part'; S.dirs = items.map(() => fd === 'mix' ? (Math.random() < .5 ? 'part' : 'mean') : fd); }
   VIEW = 'session';
   question();
 }
@@ -462,13 +477,68 @@ function meaningBlock(m, showN){
     (m.rel ? '<div class="note">' + esc(m.rel) + '</div>' : '') +
     (m.tip ? '<div class="note">提示：' + esc(m.tip) + '</div>' : '') + '</div>';
 }
+/* blank the particle words (keep the verb and other words) */
+const GAP = '<span class="gap" aria-label="空格"></span>';
+function bigGaps(ph){
+  const w = ph.p.split(' ');
+  return '<span class="vb">' + esc(w[0]) + '</span> ' + w.slice(1).map(x => PARTS.has(x) ? GAP : esc(x)).join(' ');
+}
+function gapEx(ex, ph){
+  const words = ph.p.split(' '); const parts = words.slice(1).filter(x => PARTS.has(x)); const f = formsOf(ph.b);
+  const toks = ex.split(/(\s+)/);
+  let started = -1, left = parts.slice(); const verb = new Set(), gaps = new Set();
+  for (let i = 0; i < toks.length; i++) {
+    const w = toks[i].toLowerCase().replace(/[^a-z']/g, '');
+    if (started < 0) { if (f.all.has(w) || (ph.b === 'be' && (/^(am|is|are|was|were|be|been)$/.test(w) || /'(m|re|s)$/.test(w)))) { started = i; verb.add(i); } }
+    else {
+      if (i - started > 14) break;
+      const k = left.indexOf(w); if (k >= 0) { gaps.add(i); left.splice(k, 1); }
+      if (!left.length) break;
+    }
+  }
+  if (started < 0 || left.length) return null;
+  return toks.map((t, i) => {
+    if (verb.has(i)) return '<b class="hl">' + esc(t) + '</b>';
+    if (gaps.has(i)) { const m = t.match(/^([^a-zA-Z']*)[a-zA-Z']+([^a-zA-Z']*)$/); return m ? esc(m[1]) + GAP + esc(m[2]) : GAP; }
+    return esc(t);
+  }).join('');
+}
+function flashFront(p, dir){
+  const multi = p.m.length > 1;
+  const top = '<div style="display:flex;align-items:center;gap:8px;min-height:44px"><span class="pill" style="color:var(--sun-ink)">' + LV[p.lv] + '</span><span style="flex:1"></span>' + (dir === 'mean' ? sayBtn(p.p) : '') + '</div>';
+  let body;
+  if (dir === 'part') {
+    body = '<div class="big">' + bigGaps(p) + '</div>' +
+      p.m.map((m, i) => { const g = gapEx(m.ex, p); return (i ? '<hr>' : '') + '<div class="mean"><div class="mh">' + (multi ? '<span class="mn">' + m.n + '</span>' : '') + '<span class="mz">' + esc(m.zh) + '</span></div>' + (g ? '<p class="ex en">' + g + '</p>' : '') + '</div>'; }).join('') +
+      '<p class="hintline">先在心裏想出缺少的 particle' + (p.p.split(' ').slice(1).filter(x => PARTS.has(x)).length > 1 ? 's' : '') + '。</p>';
+  } else {
+    body = '<div class="big">' + bigPhrase(p) + '</div><div class="ty">' + esc(p.m[0].ty) + (multi ? ' · ' + p.m.length + ' 個意思' : '') + '</div>' +
+      p.m.map((m, i) => (i ? '<hr>' : '') + '<div class="mean"><div class="mh">' + (multi ? '<span class="mn">' + m.n + '</span>' : '') + '</div><p class="ex en">' + hlEx(m.ex, p) + '</p></div>').join('') +
+      '<p class="hintline">先在心裏想出中文意思。</p>';
+  }
+  return '<div class="fcard" style="' + pvar(p.g) + '">' + top + body + '</div>';
+}
 function qFlash(p){
   const multi = p.m.length > 1;
+  if (S.phase === 'ask') {
+    render(topbar() + '<main class="pbody">' + flashFront(p, S.dirs[S.i]) +
+      '<button class="b3d primary wide" data-act="fshow">顯示答案</button></main>');
+    return;
+  }
   render(topbar() + '<main class="pbody"><div class="fcard" style="' + pvar(p.g) + '">' +
     '<div style="display:flex;align-items:center;gap:8px"><span class="pill" style="color:var(--sun-ink)">' + LV[p.lv] + '</span><span style="flex:1"></span>' + sayBtn(p.p) + '</div>' +
     '<div class="big">' + bigPhrase(p) + '</div><div class="ty">' + esc(p.m[0].ty) + (multi ? ' · ' + p.m.length + ' 個意思' : '') + '</div>' +
     p.m.map((m, i) => (i ? '<hr>' : '') + meaningBlock(m, multi)).join('') + '</div>' +
-    '<p class="ask">你記得這個片語嗎？</p><div class="row2"><button class="b3d" data-act="fno">還未記得</button><button class="b3d primary" data-act="fyes">我記得了</button></div></main>');
+    '<div class="row2"><button class="b3d nob" data-act="fno">仍需練習</button><button class="b3d yesb" data-act="fyes">記住了</button></div></main>');
+}
+/* flashcard direction picker */
+function flashPick(){
+  VIEW = 'flashpick';
+  const opts = [['part', '填 particle', '看中文意思，想出缺少的 particle'], ['mean', '說出意思', '看片語，想出中文意思'], ['mix', '混合', '兩種卡隨機出現']];
+  render('<header class="page-head"><button class="x-btn" data-go="home" aria-label="返回">' + ICON.back + '</button><h1><span style="color:var(--amber)">記憶卡</span> · 選擇模式</h1></header>' +
+    '<section class="sec"><div class="dirs" role="group" aria-label="記憶卡模式">' +
+    opts.map(o => '<button class="b3d dir" data-fdir="' + o[0] + '" aria-pressed="' + (SET.fdir === o[0]) + '"><b>' + o[1] + '</b><span>' + o[2] + '</span></button>').join('') +
+    '</div><p class="muted" style="font-size:14px">按一下就會開始，下次會記住你的選擇。</p></section>');
 }
 function flashAnswer(ok){ const p = S.items[S.i]; p.m.forEach(m => setBox(m.id, ok)); record(p, ok); next(); }
 
@@ -816,7 +886,8 @@ document.addEventListener('click', e => {
   if (d.go) return go(d.go, d.focus === 'search');
   if (d.lv !== undefined) { const i = +d.lv; SET.levels = SET.levels.includes(i) ? SET.levels.filter(x => x !== i) : SET.levels.concat(i); save(); return home(); }
   if (d.part !== undefined) { const g = d.part; SET.parts = SET.parts.includes(g) ? SET.parts.filter(x => x !== g) : SET.parts.concat(g); save(); return home(); }
-  if (d.mode) return start(d.mode);
+  if (d.mode) return d.mode === 'flash' ? flashPick() : start(d.mode);
+  if (d.fdir) { SET.fdir = d.fdir; save(); return start('flash'); }
   if (d.opt !== undefined) return choiceAnswer(+d.opt);
   if (d.pm !== undefined) return pmAnswer(+d.pm);
   if (d.pl) return particleDetail(d.pl);
@@ -835,6 +906,7 @@ document.addEventListener('click', e => {
     case 'lessparts': showAllParts = false; return home();
     case 'clearparts': SET.parts = []; save(); return home();
     case 'exit': return S && S.res.length ? results() : home();
+    case 'fshow': S.phase = 'show'; return qFlash(S.items[S.i]);
     case 'fyes': return flashAnswer(true);
     case 'fno': return flashAnswer(false);
     case 'next': return next();
